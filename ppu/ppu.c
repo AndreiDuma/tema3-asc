@@ -52,6 +52,12 @@ void compress_parallel(struct img *image, struct c_img *c_image, struct img *d_i
     pthread_t threads[MAX_SPU_THREADS];
     args_t thread_arg[MAX_SPU_THREADS] __attribute__ ((aligned(16)));
 
+    c_image->width = image->width;
+    c_image->height = image->height;
+
+    d_image->width = image->width;
+    d_image->height = image->height;
+
     /* 
      * Create several SPE-threads to execute 'spu'.
      */

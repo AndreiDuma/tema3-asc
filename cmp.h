@@ -40,7 +40,7 @@ struct block {
 	unsigned char min, max;
 	//index matrix for the pixels in the block
 	unsigned char index_matrix[BLOCK_SIZE * BLOCK_SIZE];
-};
+} __attribute__ ((aligned(16))) args_t;
 
 struct c_img{
 	//compressed image
