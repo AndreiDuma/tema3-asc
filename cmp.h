@@ -21,15 +21,16 @@ typedef enum {
     DMA_DOUBLE_BUF
 } mode_dma_t;
 
-typedef struct {
+struct args {
     struct img *image;
     struct c_img *c_image;
     struct img *d_image;
 
     mode_vect_t mode_vect;
     mode_dma_t mode_dma;
-} __attribute__ ((aligned(16))) args_t;
+} __attribute__ ((aligned(16)));
 
+typedef struct args args_t;
 
 /* Image structures */
 struct img {
