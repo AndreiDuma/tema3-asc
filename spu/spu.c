@@ -71,7 +71,7 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
         return -1;
     }
 
-    args_t args __attribute__ ((aligned(16)));
+    args_t args;
 
     /* Get the arguments through DMA */
     mfc_get((void *) &args, (uint32_t) argp, sizeof(args_t), tag_id, 0, 0);
@@ -92,7 +92,7 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
         blk_num = blk_width * blk_height,
         blk_index;
 
-    for (blk_index = speid; blk_index < blk_no; blk_index += blk_num) {
+    for (blk_index = speid; blk_index < blk_num; blk_index += blk_num) {
         int blk_row = blk_index / blk_width * BLOCK_SIZE,
             blk_col = blk_index % blk_width * BLOCK_SIZE;
 
@@ -134,7 +134,7 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
         }
 
         /* put the block back in memory */
-        mfc_put((void *) &blk, (uint32_t) &c_image->blocks[blk_index], sizeof(struct block), tag_id, 0, 0);
+        mfc_put((void *) &blk, (uint32_t) &args.c_image->blocks[blk_index], sizeof(struct block), tag_id, 0, 0);
         waitag(tag_id);
     }
 
