@@ -68,7 +68,7 @@ void _read_buffer(int fd, void* buf, int size){
 void* _alloc(int size){
 	void *res;
 
-	res = malloc(size);
+	posix_memalign(&res, 16, size);
 	if (!res){
 		fprintf(stderr, "%s: Failed to allocated %d bytes\n", __func__,
 				size);
