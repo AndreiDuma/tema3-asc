@@ -1,3 +1,6 @@
+#ifndef __CMP_H
+#define __CMP_H
+
 #define BUF_SIZE 		256
 #define BLOCK_SIZE 		16
 #define NUM_COLORS_PALETTE 16
@@ -68,3 +71,5 @@ void free_cmp(struct c_img* out_img);
 void read_pgm(char* path, struct img* in_img);
 void write_pgm(char* path, struct img* out_img);
 void free_pgm(struct img* out_img);
+
+#endif

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <spu_intrinsics.h>
 #include <spu_mfcio.h>
 
