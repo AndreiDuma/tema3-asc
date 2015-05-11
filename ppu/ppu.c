@@ -16,7 +16,6 @@ extern spe_program_handle_t spu;
 void *ppu_pthread_function(void *thread_arg) {
 
     spe_context_ptr_t ctx;
-    pointers_t *arg = (pointers_t *) thread_arg;
 
     /* Create SPE context */
     if ((ctx = spe_context_create(0, NULL)) == NULL) {
