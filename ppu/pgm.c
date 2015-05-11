@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "cmp.h"
+#include "../cmp.h"
 
 void read_pgm(char* path, struct img* in_img){
 	int fd;
