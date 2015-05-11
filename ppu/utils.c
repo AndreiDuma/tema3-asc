@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <malloc.h>
 
 int _open_for_read(char* path){
 	int fd;
@@ -68,7 +69,8 @@ void _read_buffer(int fd, void* buf, int size){
 void* _alloc(int size){
 	void *res;
 
-	posix_memalign(&res, 16, size);
+	//posix_memalign(&res, 16, size);
+	res = memalign(16, size);
 	if (!res){
 		fprintf(stderr, "%s: Failed to allocated %d bytes\n", __func__,
 				size);
