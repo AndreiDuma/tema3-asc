@@ -105,6 +105,7 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
 
         unsigned char min = pixels[0],
                       max = pixels[0];
+        int i;
         for (i = 0; i < BLOCK_SIZE * BLOCK_SIZE; i++){
             if (pixels[i] < min) {
                 min = pixels[i];
