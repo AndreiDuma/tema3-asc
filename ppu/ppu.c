@@ -50,7 +50,7 @@ void *ppu_pthread_function(void *thread_arg) {
 void compress_parallel(struct img *image, struct c_img *c_image, struct img *d_image, mode_vect_t mode_vect, mode_dma_t mode_dma, int spu_threads) {
 
     pthread_t threads[MAX_SPU_THREADS];
-    args_t thread_arg[MAX_SPU_THREADS] __attribute__ ((aligned(16)));
+    struct args thread_arg[MAX_SPU_THREADS] __attribute__ ((aligned(16)));
 
     c_image->width = image->width;
     c_image->height = image->height;
