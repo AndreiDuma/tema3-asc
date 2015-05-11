@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "cmp.h"
+#include "../cmp.h"
 
 void write_cmp(char* path, struct c_img* out_img){
 	int i, nr_blocks, j, fd, k, file_size;
