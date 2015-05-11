@@ -30,7 +30,7 @@ struct args {
     mode_dma_t mode_dma;
 } __attribute__ ((aligned(16)));
 
-typedef struct args args_t;
+//typedef struct args args_t;
 
 /* Image structures */
 struct img {
