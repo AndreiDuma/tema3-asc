@@ -5,7 +5,7 @@
 #include <libspe2.h>
 #include <pthread.h>
 
-#include "../common/cmp.h"
+#include "../cmp.h"
 
 extern spe_program_handle_t spu;
 

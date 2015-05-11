@@ -25,6 +25,8 @@ typedef struct {
 
     mode_vect_t mode_vect;
     mode_dma_t mode_dma;
+
+    char padding[16];
 } args_t;
 
 
