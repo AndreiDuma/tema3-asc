@@ -71,17 +71,17 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
         return -1;
     }
 
-    args_t args;
+    struct args arg;
 
     /* Get the arguments through DMA */
-    mfc_get((void *) &args, (uint32_t) argp, sizeof(args_t), tag_id, 0, 0);
+    mfc_get((void *) &arg, (uint32_t) argp, sizeof(struct args), tag_id, 0, 0);
     waitag(tag_id);
 
     /* Get image information */
     struct img image;
     struct c_img c_image;
     struct img d_image;
-    mfc_get((void *) &image, (uint32_t) args.image, sizeof(struct img), tag_id, 0, 0);
+    mfc_get((void *) &image, (uint32_t) arg.image, sizeof(struct img), tag_id, 0, 0);
     waitag(tag_id);
 
     unsigned char pixels[BLOCK_SIZE * BLOCK_SIZE];
@@ -135,7 +135,7 @@ int main(unsigned long long speid, unsigned long long argp, unsigned long long e
         }
 
         /* put the block back in memory */
-        mfc_put((void *) &blk, (uint32_t) &args.c_image->blocks[blk_index], sizeof(struct block), tag_id, 0, 0);
+        mfc_put((void *) &blk, (uint32_t) &arg.c_image->blocks[blk_index], sizeof(struct block), tag_id, 0, 0);
         waitag(tag_id);
     }
 

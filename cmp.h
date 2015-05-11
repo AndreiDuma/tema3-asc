@@ -3,7 +3,7 @@
 
 #define BUF_SIZE 		256
 #define BLOCK_SIZE 		16
-#define NUM_COLORS_PALETTE 16
+#define NUM_COLORS_PALETTE	16
 
 //macro for easily getting how much time has passed between two events
 #define GET_TIME_DELTA(t1, t2) ((t2).tv_sec - (t1).tv_sec + \
