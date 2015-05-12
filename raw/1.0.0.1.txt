@@ -1,0 +1,2 @@
+Compress / Decompress time: 1.975006
+Total time: 3.507609

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILES="1"
+FILES="4"
 MODE_DMA="0 1"
 MODE_VECT="0 1 2"
 SPU_NUMS="1 2 4 8"
@@ -26,5 +26,3 @@ do
         done
     done
 done
-
-# rm -r results
