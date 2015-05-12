@@ -29,9 +29,17 @@ void *ppu_pthread_function(void *thread_arg) {
         exit(1);
     }
 
-    /* Run SPE context */
+    /* Run SPE context for compression */
+    ((struct args *) thread_arg)->mode_op = MODE_COMP;
     unsigned int entry = SPE_DEFAULT_ENTRY;
-    /* transfer prin argument adresa pentru transferul DMA initial */
+    if (spe_context_run(ctx, &entry, 0, thread_arg, NULL, NULL) < 0) {  
+        perror("Failed running context");
+        exit(1);
+    }
+
+    /* Run SPE context for decompression */
+    ((struct args *) thread_arg)->mode_op = MODE_DECOMP;
+    entry = SPE_DEFAULT_ENTRY;
     if (spe_context_run(ctx, &entry, 0, thread_arg, NULL, NULL) < 0) {  
         perror("Failed running context");
         exit(1);
@@ -46,31 +54,33 @@ void *ppu_pthread_function(void *thread_arg) {
     pthread_exit(NULL);
 }
 
-
-void compress_parallel(struct img *image, struct c_img *c_image, struct img *d_image, mode_vect_t mode_vect, mode_dma_t mode_dma, int spu_threads) {
+void compress_parallel(struct img *image, struct c_img *c_image, struct img *d_image, mode_vect_t mode_vect, mode_dma_t mode_dma, int spu_num) {
 
     pthread_t threads[MAX_SPU_THREADS];
     struct args thread_arg[MAX_SPU_THREADS] __attribute__ ((aligned(16)));
 
+    /* set image attributes */
     c_image->width = image->width;
     c_image->height = image->height;
+    c_image->blocks = _alloc((image->width / BLOCK_SIZE) * (image->height / BLOCK_SIZE) * sizeof(struct block));
 
     d_image->width = image->width;
     d_image->height = image->height;
+    d_image->pixels = _alloc(image->width * image->height * sizeof(unsigned char));
 
     /* 
      * Create several SPE-threads to execute 'spu'.
      */
     int i;
-    for(i = 0; i < spu_threads; i++) {
+    for(i = 0; i < spu_num; i++) {
         /* Thread arguments */
+        thread_arg[i].spu = i;
         thread_arg[i].image = image;
         thread_arg[i].c_image = c_image;
         thread_arg[i].d_image = d_image;
         thread_arg[i].mode_vect = mode_vect;
         thread_arg[i].mode_dma = mode_dma;
-
-        printf("%d\n", sizeof(thread_arg[0]));
+        thread_arg[i].spu_num = spu_num;
 
         /* Create thread for each SPE context */
         if (pthread_create(&threads[i], NULL, &ppu_pthread_function, &thread_arg[i]))  {
@@ -80,7 +90,7 @@ void compress_parallel(struct img *image, struct c_img *c_image, struct img *d_i
     }
 
     /* Wait for SPU-thread to complete execution.  */
-    for (i = 0; i < spu_threads; i++) {
+    for (i = 0; i < spu_num; i++) {
         if (pthread_join(threads[i], NULL)) {
             perror("Failed pthread_join");
             exit(1);
@@ -95,14 +105,14 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    /* Original and decompressed images */
+    /* original and decompressed images */
     struct img image __attribute__ ((aligned(16)));
     struct img d_image __attribute__ ((aligned(16)));
 
-    /* Compressed image */
+    /* compressed image */
     struct c_img c_image __attribute__ ((aligned(16)));
 
-    /* Command line arguments */
+    /* command line arguments */
     mode_vect_t mode_vect = atoi(argv[1]);
     mode_dma_t mode_dma = atoi(argv[2]);
     int num_spus = atoi(argv[3]);
@@ -110,7 +120,7 @@ int main(int argc, char *argv[]){
     char *out_cmp = argv[5];
     char *out_pgm = argv[6];
 
-    /* Time measurement */
+    /* time measurement */
     struct timeval t1, t2, t3, t4;
     double total_time = 0, scale_time = 0;
 
@@ -119,25 +129,22 @@ int main(int argc, char *argv[]){
 
     read_pgm(in_pgm, &image);  
 
-    /* Start timer, without I/O */
+    /* start timer, without I/O */
     gettimeofday(&t1, NULL);
     compress_parallel(&image, &c_image, &d_image, mode_vect, mode_dma, num_spus);
 
-    /* Stop timer */
+    /* stop timer */
     gettimeofday(&t2, NULL);    
 
-printf("1\n");
     write_cmp(out_cmp, &c_image);
-printf("2\n");
     write_pgm(out_pgm, &d_image);
-printf("3\n");
 
+    /* free resources */
     free_cmp(&c_image);
     free_pgm(&image);
     free_pgm(&d_image);
 
-printf("4\n");
-    /* Stop timer */
+    /* stop timer */
     gettimeofday(&t4, NULL);
 
     total_time += GET_TIME_DELTA(t3, t4);

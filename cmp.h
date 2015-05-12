@@ -5,11 +5,16 @@
 #define BLOCK_SIZE 		16
 #define NUM_COLORS_PALETTE	16
 
-//macro for easily getting how much time has passed between two events
+/* macro for easily getting how much time has passed between two events */
 #define GET_TIME_DELTA(t1, t2) ((t2).tv_sec - (t1).tv_sec + \
 		((t2).tv_usec - (t1).tv_usec) / 1000000.0)
 
-/* Arguments structures */
+/* arguments structures */
+typedef enum {
+    MODE_COMP,
+    MODE_DECOMP
+} mode_op_t;
+
 typedef enum {
     SCALAR,
     VECT,
@@ -22,22 +27,24 @@ typedef enum {
 } mode_dma_t;
 
 struct args {
+    int spu;
+    mode_op_t mode_op;
+
     struct img *image;
     struct c_img *c_image;
     struct img *d_image;
 
     mode_vect_t mode_vect;
     mode_dma_t mode_dma;
+    int spu_num;
 } __attribute__ ((aligned(16)));
 
-//typedef struct args args_t;
-
-/* Image structures */
+/* image structures */
 struct img {
 	//regular image
 	int width, height;
 	unsigned char* pixels;
-};
+} __attribute__ ((aligned(16)));
 
 struct block {
 	//min and max values for the block
@@ -50,7 +57,7 @@ struct c_img{
 	//compressed image
 	int width, height;
 	struct block* blocks;
-};
+} __attribute__ ((aligned(16)));
 
 struct nibbles {
 	unsigned first_nibble : 4;
