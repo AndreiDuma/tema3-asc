@@ -7,7 +7,7 @@ DIRS := ../spu
 ################
 # Target
 ################
-PROGRAM_ppu := ppu
+PROGRAM_ppu := ../tema3
 
 ################
 # Local Defines
