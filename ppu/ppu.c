@@ -10,8 +10,6 @@
 extern spe_program_handle_t spu;
 
 #define MAX_SPU_THREADS   8
-#define ARR_SIZE    80000
-#define CHUNK (ARR_SIZE / MAX_SPU_THREADS)
 
 void *ppu_pthread_function(void *thread_arg) {
 

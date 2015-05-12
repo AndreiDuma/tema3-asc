@@ -1,0 +1,68 @@
+/**
+ * Andrei Dorian DUMA
+ * 334CA
+ */
+
+Tema 3 a fost una foarte interesantă. Am învățat o mulțime de lucruri noi.
+Câteva detalii de implementare + concluziile trase:
+
+1. DMA single-buffered, operații scalare:
+
+  * pentru măsurători de timp am păstrat structura codului serial. Partea
+  paralelizată are loc în funcția compress_parallel, care setează argumentele
+  necesare thread-urilor rulate pe SPU-uri.
+  * pentru măsurarea realistă a timpului compresie + decompresie, rulez
+  câte un context pe thread-uri pentru fiecare din operații, selecția codului
+  făcându-se în funcție de câmpul mode_op al structurii arg trimise SPU-urilor.
+  * în funcția main de pe SPU-uri, se primește structura de parametri, apoi se
+  apelează fie compress, fie decompress în funcție de mode_op.
+  * implementarea single-buffered este de fapt o implementare particulară de
+  double-buffering, unde buf = next_buf = 0, blk_index = blk_index_next și
+  unde transferul inițial nu are loc. Codul este mult simplificat de această
+  particularizare.
+  * creez un vector de unsigned char de dimensiune BLOCK_SIZE^2 pe care lucrez
+  în SPU; aduc pixelii de la poziția corespunzătoare din memoria principală,
+  apoi calculez indecșii într-un bloc local, pe care îl trimit tot prin DMA
+  înapoi la PPU.
+  * la decompresie, iau un bloc prin DMA, calculez pixelii din indecși și
+  trimit înapoi prin DMA cei BLOCK_SIZE^2 pixeli.
+  * codul cu operații scalare și cast-uri este ca în varianta serială dată.
+
+2. DMA single-buffered, operații vectoriale:
+
+  * similar sub toate aspectele cu 1., mai puțin calculul efectiv al indecșilor
+  sau pixelilor. Am BLOCK_SIZE^2 float-uri în care așez pixelii, apoi folosesc
+  operații vectoriale ca să calculez câte 4 float-uri odată (1 vector float).
+  Convertesc apoi cele BLOCK_SIZE^2 float-uri în BLOCK_SIZE^2 unsigned char-uri
+  folosind tot cast-uri obișnuite.
+  * îmbunătățirea în performanță este semnificativă la această optimizare.
+
+3. DMA single-buffered, operații vectoriale + intrinsics:
+
+  * similar cu 2., doar că cele BLOCK_SIZE^2 float-uri sunt calculate diferit:
+  mai întâi "asamblez manual" BLOCK_SIZE^2 unsigned int-uri din char-uri,
+  plasând manual octeții pe poziție corectă (cu pointeri). Cu ocazia asta, am
+  (re)descoperit că arhitectura asta e big-endian. Apoi convertesc vector
+  unsigned int la vector float folosind spu_convtf. După calculul cu operații
+  vectoriale, revin la unsigned int cu spu_convtu și apoi extrag din nou
+  octeții manual.
+  * îmbunătățirea nu e fantastică, dar e totuși vizibilă.
+
+4. DMA double-buffered:
+
+  * implementare similară cu laboratorul.
+  * single-buffering-ul este o particularizare (zic eu elegantă) a double
+  buffering-ului.
+  * îmbunătățire redusă, dar observabilă a performanței.
+
+Pentru toate comentariile de mai sus, se pot vedea graficele în directorul
+plots/, generate cu make_plots.sh din datele din results/ (generate la rândul
+lor din datele brute din raw/ - care sunt generate de run_all.sh :D). Există
+câte un grafic pentru fiecare fișier de intrare.
+În fiecare grafic, axa X reprezintă numărul de SPU-uri, iar axa Y reprezintă
+timpul de Compress + Decompress. Fiecare fișier de plot conține 6 grafice,
+corespunzătoare celor 2 (DMA modes) * 3 (computation modes).
+
+Sper că am acoperit cerințele și explicațiile necesare. A fost o temă faină.
+
+Andrei
